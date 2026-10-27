@@ -1,0 +1,633 @@
+[
+  {
+    "name": "GitHub",
+    "url": "https://github.com/{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$",
+    "hasAdapter": true
+  },
+  {
+    "name": "GitLab",
+    "url": "https://gitlab.com/{}",
+    "category": "tech",
+    "errorType": "message",
+    "errorMsg": ["Page Not Found", "Sign in · GitLab", "The page you're looking for could not be found"],
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Bitbucket",
+    "url": "https://bitbucket.org/{}/",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "DockerHub",
+    "url": "https://hub.docker.com/u/{}/",
+    "urlProbe": "https://hub.docker.com/v2/users/{}/",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9]{4,30}$"
+  },
+  {
+    "name": "npm",
+    "url": "https://www.npmjs.com/~{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-z0-9](?:[a-z0-9_.-]*[a-z0-9])?$"
+  },
+  {
+    "name": "PyPI",
+    "url": "https://pypi.org/user/{}/",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Dev.to",
+    "url": "https://dev.to/{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
+  },
+  {
+    "name": "Hashnode",
+    "url": "https://hashnode.com/@{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Kaggle",
+    "url": "https://www.kaggle.com/{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]{3,30}$"
+  },
+  {
+    "name": "Replit",
+    "url": "https://replit.com/@{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
+  },
+  {
+    "name": "Codecademy",
+    "url": "https://www.codecademy.com/profiles/{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Codewars",
+    "url": "https://www.codewars.com/users/{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "HackerRank",
+    "url": "https://www.hackerrank.com/{}",
+    "urlProbe": "https://www.hackerrank.com/rest/hackers/{}/profile",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "LeetCode",
+    "url": "https://leetcode.com/{}/",
+    "category": "tech",
+    "errorType": "message",
+    "errorMsg": ["User does not exist", "page not found"],
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Keybase",
+    "url": "https://keybase.io/{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]{2,16}$"
+  },
+  {
+    "name": "Gravatar",
+    "url": "https://gravatar.com/{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "hasAdapter": true
+  },
+  {
+    "name": "SourceForge",
+    "url": "https://sourceforge.net/u/{}/profile/",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Pastebin",
+    "url": "https://pastebin.com/u/{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Launchpad",
+    "url": "https://launchpad.net/~{}",
+    "category": "tech",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "TabNews",
+    "url": "https://www.tabnews.com.br/{}",
+    "category": "brasil",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "hasAdapter": true
+  },
+  {
+    "name": "Reddit",
+    "url": "https://www.reddit.com/user/{}/",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]{3,20}$",
+    "hasAdapter": true
+  },
+  {
+    "name": "Twitter / X",
+    "url": "https://x.com/{}",
+    "category": "social",
+    "errorType": "message",
+    "errorMsg": ["This account doesn’t exist", "Account suspended", "page doesn’t exist"],
+    "regexCheck": "^[a-zA-Z0-9_]{1,15}$"
+  },
+  {
+    "name": "Bluesky",
+    "url": "https://bsky.app/profile/{}.bsky.social",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "hasAdapter": true
+  },
+  {
+    "name": "Mastodon (Social)",
+    "url": "https://mastodon.social/@{}",
+    "urlProbe": "https://mastodon.social/api/v1/accounts/lookup?acct={}",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
+  },
+  {
+    "name": "Telegram",
+    "url": "https://t.me/{}",
+    "category": "social",
+    "errorType": "message",
+    "errorMsg": ["If you have <strong>Telegram</strong>, you can contact <a class=\"tgme_action_button_new", "tgme_page_extra\">preview channel"],
+    "regexCheck": "^[a-zA-Z0-9_]{5,32}$"
+  },
+  {
+    "name": "Pinterest",
+    "url": "https://www.pinterest.com/{}/",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]{3,30}$"
+  },
+  {
+    "name": "Tumblr",
+    "url": "https://{}.tumblr.com/",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Flickr",
+    "url": "https://www.flickr.com/people/{}/",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_@\\-\\.]+$"
+  },
+  {
+    "name": "VK",
+    "url": "https://vk.com/{}",
+    "category": "social",
+    "errorType": "message",
+    "errorMsg": ["Page has been deleted or blocked", "This page is blocked", "Page removed"],
+    "regexCheck": "^[a-zA-Z0-9_\\.]+$"
+  },
+  {
+    "name": "AskFM",
+    "url": "https://ask.fm/{}",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
+  },
+  {
+    "name": "Linktree",
+    "url": "https://linktr.ee/{}",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Threads",
+    "url": "https://www.threads.net/@{}",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_.]+$"
+  },
+  {
+    "name": "Instagram",
+    "url": "https://www.instagram.com/{}/",
+    "category": "social",
+    "errorType": "message",
+    "errorMsg": ["Sorry, this page isn't available", "The link you followed may be broken"],
+    "regexCheck": "^[a-zA-Z0-9_.]+$"
+  },
+  {
+    "name": "TikTok",
+    "url": "https://www.tiktok.com/@{}",
+    "category": "social",
+    "errorType": "message",
+    "errorMsg": ["Couldn't find this account", "This account is private or does not exist"],
+    "regexCheck": "^[a-zA-Z0-9_.]+$"
+  },
+  {
+    "name": "Snapchat",
+    "url": "https://www.snapchat.com/add/{}",
+    "category": "social",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Steam",
+    "url": "https://steamcommunity.com/id/{}",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "hasAdapter": true
+  },
+  {
+    "name": "Twitch",
+    "url": "https://www.twitch.tv/{}",
+    "category": "gaming",
+    "errorType": "message",
+    "errorMsg": ["content is unavailable", "Unless you’ve got a time machine, that content is unavailable"],
+    "regexCheck": "^[a-zA-Z0-9_]{4,25}$"
+  },
+  {
+    "name": "Chess.com",
+    "url": "https://www.chess.com/member/{}",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "hasAdapter": true
+  },
+  {
+    "name": "Lichess",
+    "url": "https://lichess.org/@/{}",
+    "urlProbe": "https://lichess.org/api/user/{}",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Roblox",
+    "url": "https://www.roblox.com/user.aspx?username={}",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]{3,20}$"
+  },
+  {
+    "name": "Xbox Gamertag",
+    "url": "https://xboxgamertag.com/search/{}",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9 _]+$"
+  },
+  {
+    "name": "Speedrun.com",
+    "url": "https://www.speedrun.com/users/{}",
+    "urlProbe": "https://www.speedrun.com/api/v1/users?lookup={}",
+    "category": "gaming",
+    "errorType": "message",
+    "errorMsg": ["\"data\":[]"],
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Osu!",
+    "url": "https://osu.ppy.sh/users/{}",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\[\\] ]+$"
+  },
+  {
+    "name": "Itch.io",
+    "url": "https://{}.itch.io/",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Newgrounds",
+    "url": "https://{}.newgrounds.com/",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "GameJolt",
+    "url": "https://gamejolt.com/@{}",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "YouTube",
+    "url": "https://www.youtube.com/@{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Spotify",
+    "url": "https://open.spotify.com/user/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "SoundCloud",
+    "url": "https://soundcloud.com/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Bandcamp",
+    "url": "https://bandcamp.com/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Medium",
+    "url": "https://medium.com/@{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Substack",
+    "url": "https://{}.substack.com/",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Vimeo",
+    "url": "https://vimeo.com/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Dailymotion",
+    "url": "https://www.dailymotion.com/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Goodreads",
+    "url": "https://www.goodreads.com/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Letterboxd",
+    "url": "https://letterboxd.com/{}/",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
+  },
+  {
+    "name": "Last.fm",
+    "url": "https://www.last.fm/user/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Mixcloud",
+    "url": "https://www.mixcloud.com/{}/",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Wattpad",
+    "url": "https://www.wattpad.com/user/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Archive.org",
+    "url": "https://archive.org/details/@{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Duolingo",
+    "url": "https://www.duolingo.com/profile/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "hasAdapter": true
+  },
+  {
+    "name": "Behance",
+    "url": "https://www.behance.net/{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Dribbble",
+    "url": "https://dribbble.com/{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "ArtStation",
+    "url": "https://www.artstation.com/{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "500px",
+    "url": "https://500px.com/p/{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "DeviantArt",
+    "url": "https://www.deviantart.com/{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Freelancer",
+    "url": "https://www.freelancer.com/u/{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
+  },
+  {
+    "name": "Upwork",
+    "url": "https://www.upwork.com/freelancers/~{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
+  },
+  {
+    "name": "ProductHunt",
+    "url": "https://www.producthunt.com/@{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
+  },
+  {
+    "name": "HackerNews",
+    "url": "https://news.ycombinator.com/user?id={}",
+    "category": "tech",
+    "errorType": "message",
+    "errorMsg": "No such user.",
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "About.me",
+    "url": "https://about.me/{}",
+    "category": "professional",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Patreon",
+    "url": "https://www.patreon.com/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "BuyMeACoffee",
+    "url": "https://www.buymeacoffee.com/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Skoob",
+    "url": "https://www.skoob.com.br/usuario/{}",
+    "category": "brasil",
+    "errorType": "message",
+    "errorMsg": ["Ops! Usuário não encontrado", "Página não encontrada"],
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Filmow",
+    "url": "https://filmow.com/usuario/{}/",
+    "category": "brasil",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Jusbrasil",
+    "url": "https://www.jusbrasil.com.br/perfil/{}",
+    "category": "brasil",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Vakinha",
+    "url": "https://www.vakinha.com.br/usuario/{}",
+    "category": "brasil",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  },
+  {
+    "name": "Apoia.se",
+    "url": "https://apoia.se/{}",
+    "category": "brasil",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+  }
+]
