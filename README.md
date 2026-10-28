@@ -12,6 +12,15 @@
 ---
 
 ```
+                  . ── ~ ~ ~ ── .
+              . '   \       /   ' .
+            /       ●     ●       \
+           :                         :
+           :      \             /    :
+            \       ' ─ . . ─ '     /
+              ' .                 . '
+                  ' ── ~ ~ ~ ── '
+
     ____        __       _      __                             
    / __ \____ _/ /______(_)____/ /____  ______  _____ ____ _____
   / /_/ / __ `/ __/ ___/ / ___/ //_/ / / / __ \/ ___// __ `/ __ \
@@ -33,8 +42,9 @@ Inspirado no estilo analítico, observador e perspicaz de **Patrick Jane** da s�
 | **Dependências Externas** | Múltiplas (`requests`, `tor`, etc.) | **Zero dependências em tempo de execução** |
 | **Tempo de Inicialização** | ~800ms a 2s | **< 20ms** |
 | **Extração de Metadados** | Apenas link do perfil | **Nome real, Bio, Avatar HD, Seguidores, Streaks, Karma** |
-| **Adapters Especializados** | Raros / limitados | **GitHub, Reddit, Duolingo, Steam, Chess, Bluesky, TabNews** |
-| **Ecossistema Brasileiro** | Suporte quase nulo | **Skoob, Filmow, Jusbrasil, TabNews, Vakinha, Apoia.se** |
+| **Adapters Especializados** | Raros / limitados | **GitHub, Reddit, Steam, Roblox, Minecraft, Lichess, Chess, Speedrun, Duolingo, Bluesky, 500px, Apoia.se, Mixcloud, Dailymotion, Freelancer, Archive.org, Threads, AniList, TabNews** |
+| **Gaming & Pop Culture** | Básico / sem API | **Roblox, Minecraft (NameMC/Mojang), Steam (XML/SteamID64), Lichess, Chess.com, Speedrun.com, Itch.io, AniList, MyAnimeList** |
+| **Ecossistema Brasileiro** | Suporte quase nulo | **TabNews, Filmow, Jusbrasil, Vakinha, Apoia.se (GraphQL)** |
 | **Servidor Micro-API + SSE** | Inexistente (requer wrappers) | **Nativo com streaming SSE em tempo real e Web GUI** |
 | **Integração como Lib** | Complexa em Node | `import { huntUsername } from 'patrickuser'` |
 

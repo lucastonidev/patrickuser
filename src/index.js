@@ -44,7 +44,12 @@ export {
   checkMedium,
   checkMixcloud,
   checkDailymotion,
-  checkThreads
+  checkThreads,
+  checkMinecraft,
+  checkRoblox,
+  checkLichess,
+  checkAniList,
+  checkSpeedrun
 } from './adapters/index.js';
 
 export {

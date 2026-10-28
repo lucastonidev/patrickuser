@@ -74,8 +74,18 @@ function getEmbeddedHtml() {
 <body>
   <div class="container">
     <header>
+      <div style="font-family: monospace; white-space: pre; color: #ef4444; font-size: 0.95rem; line-height: 1.15; margin-bottom: 0.8rem; font-weight: bold;">
+          . ── ~ ~ ~ ── .
+      . '   \\       /   ' .
+    /       ●     ●       \\
+   :                         :
+   :      \\             /    :
+    \\       ' ─ . . ─ '     /
+      ' .                 . '
+          ' ── ~ ~ ~ ── '
+      </div>
       <h1>☕ PatrickUser</h1>
-      <p class="tagline">"People leave traces of their habits everywhere." — Patrick Jane</p>
+      <p class="tagline">"Tyger Tyger, burning bright... Sherlock looked for physical clues. Patrick Jane reads what people leave behind."</p>
     </header>
 
     <div class="search-box">

@@ -21,6 +21,11 @@ describe('Specialized Adapters Registry', () => {
     assert.strictEqual(hasAdapter('Mixcloud'), true);
     assert.strictEqual(hasAdapter('Dailymotion'), true);
     assert.strictEqual(hasAdapter('Threads'), true);
+    assert.strictEqual(hasAdapter('Minecraft'), true);
+    assert.strictEqual(hasAdapter('Roblox'), true);
+    assert.strictEqual(hasAdapter('Lichess'), true);
+    assert.strictEqual(hasAdapter('AniList'), true);
+    assert.strictEqual(hasAdapter('Speedrun.com'), true);
     assert.strictEqual(hasAdapter('NonExistentSite123'), false);
   });
 

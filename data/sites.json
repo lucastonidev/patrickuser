@@ -308,7 +308,8 @@
     "category": "gaming",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$",
+    "hasAdapter": true
   },
   {
     "name": "Roblox",
@@ -316,7 +317,17 @@
     "category": "gaming",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_]{3,20}$"
+    "regexCheck": "^[a-zA-Z0-9_]{3,20}$",
+    "hasAdapter": true
+  },
+  {
+    "name": "Minecraft (NameMC)",
+    "url": "https://namemc.com/profile/{}",
+    "category": "gaming",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]{3,16}$",
+    "hasAdapter": true
   },
   {
     "name": "Xbox Gamertag",
@@ -333,7 +344,32 @@
     "category": "gaming",
     "errorType": "message",
     "errorMsg": ["\"data\":[]"],
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$",
+    "hasAdapter": true
+  },
+  {
+    "name": "AniList",
+    "url": "https://anilist.co/user/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "hasAdapter": true
+  },
+  {
+    "name": "MyAnimeList",
+    "url": "https://myanimelist.net/profile/{}",
+    "category": "content",
+    "errorType": "status_code",
+    "errorCode": 404,
     "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "Disqus",
+    "url": "https://disqus.com/by/{}/",
+    "category": "community",
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_]+$"
   },
   {
     "name": "Osu!",

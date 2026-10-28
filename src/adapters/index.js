@@ -17,6 +17,11 @@ import { checkMedium } from './medium.js';
 import { checkMixcloud } from './mixcloud.js';
 import { checkDailymotion } from './dailymotion.js';
 import { checkThreads } from './threads.js';
+import { checkMinecraft } from './minecraft.js';
+import { checkRoblox } from './roblox.js';
+import { checkLichess } from './lichess.js';
+import { checkAniList } from './anilist.js';
+import { checkSpeedrun } from './speedrun.js';
 
 /**
  * @type {Map<string, function(string, Object): Promise<import('../core/types.js').ServiceResult>>}
@@ -42,6 +47,14 @@ adapters.set('medium', checkMedium);
 adapters.set('mixcloud', checkMixcloud);
 adapters.set('dailymotion', checkDailymotion);
 adapters.set('threads', checkThreads);
+adapters.set('minecraft', checkMinecraft);
+adapters.set('minecraft (namemc)', checkMinecraft);
+adapters.set('namemc', checkMinecraft);
+adapters.set('roblox', checkRoblox);
+adapters.set('lichess', checkLichess);
+adapters.set('anilist', checkAniList);
+adapters.set('speedrun.com', checkSpeedrun);
+adapters.set('speedrun', checkSpeedrun);
 
 /**
  * Check if a specialized adapter exists for the given site
@@ -81,5 +94,10 @@ export {
   checkMedium,
   checkMixcloud,
   checkDailymotion,
-  checkThreads
+  checkThreads,
+  checkMinecraft,
+  checkRoblox,
+  checkLichess,
+  checkAniList,
+  checkSpeedrun
 };
