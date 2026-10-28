@@ -70,3 +70,4 @@ export async function checkSpeedrun(username, options = {}) {
     };
   }
 }
+
