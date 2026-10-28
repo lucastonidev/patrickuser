@@ -3,6 +3,8 @@
 > *"Sherlock looked for physical footprints. Patrick Jane reads what people leave behind in plain sight."*  
 > **O Sucessor Turbinado do Sherlock para Investigação OSINT em 100% JavaScript Nativo (Node.js ESM).**
 
+[🇧🇷 Português](README.md) | [🇺🇸 English](README.en.md) | [🇪🇸 Español](README.es.md)
+
 [![Node Version](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0%20(Pure%20Native)-blue?style=flat-square)](package.json)
 [![Zero Build Step](https://img.shields.io/badge/Build%20Step-Zero%20(Instant%20Run)-orange?style=flat-square)](bin/patrickuser.js)
@@ -12,14 +14,38 @@
 ---
 
 ```
-                  . ── ~ ~ ~ ── .
-              . '   \       /   ' .
-            /       ●     ●       \
-           :                         :
-           :      \             /    :
-            \       ' ─ . . ─ '     /
-              ' .                 . '
-                  ' ── ~ ~ ~ ── '
+                    ███████    ██
+              ████████████████    ██
+                     ████████████████  ██
+                                 ████████  █
+                                       ████████
+                       ███                  ██████
+                   ████████                     ████
+               ███████                            ████
+            ██████                                  ████
+          █████                                       ███
+        █████                                          ███
+       ████                                              ██
+      ███                             ██████             ███
+     ████            ███           ███████████            ██
+   ████         █████████                ███ █            █
+  ████         ███                         █              █
+  ████         █                           █              █
+  ████         █                           █              █
+  ████         █                           █             ██
+   ████        █                           █            ██
+   █████       █                       █████           ███
+     ████      █    ████           ██████             ██
+      ████     █     ████████████████               ███
+        ████         █     █    ███               ███
+          ██████     █     █                  ████
+            ██████         █              █████
+               ████████    █       ████████
+                   ██████████████████
+                    █
+                    █
+                                         █
+                                          █
 
     ____        __       _      __                             
    / __ \____ _/ /______(_)____/ /____  ______  _____ ____ _____
