@@ -244,3 +244,4 @@ Distributed under the **MIT** License. See [LICENSE](LICENSE) for details.
 <p align="center">
   <i>"Tyger Tyger, burning bright... In OSINT, observe what others overlook." — PatrickUser Team</i>
 </p>
+

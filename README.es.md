@@ -244,3 +244,4 @@ Distribuido bajo la Licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) par
 <p align="center">
   <i>"Tyger Tyger, burning bright... En OSINT, observa lo que otros pasan por alto." — Equipo PatrickUser</i>
 </p>
+
