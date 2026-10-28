@@ -49,7 +49,8 @@ export {
   checkRoblox,
   checkLichess,
   checkAniList,
-  checkSpeedrun
+  checkSpeedrun,
+  checkTikTok
 } from './adapters/index.js';
 
 export {

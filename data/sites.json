@@ -265,9 +265,10 @@
     "name": "TikTok",
     "url": "https://www.tiktok.com/@{}",
     "category": "social",
-    "errorType": "message",
-    "errorMsg": ["Couldn't find this account", "This account is private or does not exist", "SlardarWAF", "_wafchallengeid"],
-    "regexCheck": "^[a-zA-Z0-9_.]+$"
+    "errorType": "status_code",
+    "errorCode": 404,
+    "regexCheck": "^[a-zA-Z0-9_.]+$",
+    "hasAdapter": true
   },
   {
     "name": "Snapchat",
@@ -402,6 +403,14 @@
     "errorType": "status_code",
     "errorCode": 404,
     "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+  },
+  {
+    "name": "GOG.com",
+    "url": "https://www.gog.com/u/{}",
+    "category": "gaming",
+    "errorType": "message",
+    "errorMsg": ["Profile does not exist", "404"],
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
   },
   {
     "name": "YouTube",

@@ -22,6 +22,7 @@ import { checkRoblox } from './roblox.js';
 import { checkLichess } from './lichess.js';
 import { checkAniList } from './anilist.js';
 import { checkSpeedrun } from './speedrun.js';
+import { checkTikTok } from './tiktok.js';
 
 /**
  * @type {Map<string, function(string, Object): Promise<import('../core/types.js').ServiceResult>>}
@@ -55,6 +56,7 @@ adapters.set('lichess', checkLichess);
 adapters.set('anilist', checkAniList);
 adapters.set('speedrun.com', checkSpeedrun);
 adapters.set('speedrun', checkSpeedrun);
+adapters.set('tiktok', checkTikTok);
 
 /**
  * Check if a specialized adapter exists for the given site
@@ -99,5 +101,6 @@ export {
   checkRoblox,
   checkLichess,
   checkAniList,
-  checkSpeedrun
+  checkSpeedrun,
+  checkTikTok
 };

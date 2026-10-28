@@ -26,6 +26,7 @@ describe('Specialized Adapters Registry', () => {
     assert.strictEqual(hasAdapter('Lichess'), true);
     assert.strictEqual(hasAdapter('AniList'), true);
     assert.strictEqual(hasAdapter('Speedrun.com'), true);
+    assert.strictEqual(hasAdapter('TikTok'), true);
     assert.strictEqual(hasAdapter('NonExistentSite123'), false);
   });
 
