@@ -50,3 +50,4 @@ describe('Report Exporters (JSON, CSV, Markdown)', () => {
     assert.ok(md.includes('| **GitHub** | `tech` | [https://github.com/alice](https://github.com/alice)'));
   });
 });
+

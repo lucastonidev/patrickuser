@@ -13,6 +13,14 @@ describe('Specialized Adapters Registry', () => {
     assert.strictEqual(hasAdapter('Bluesky'), true);
     assert.strictEqual(hasAdapter('TabNews'), true);
     assert.strictEqual(hasAdapter('Gravatar'), true);
+    assert.strictEqual(hasAdapter('Apoia.se'), true);
+    assert.strictEqual(hasAdapter('500px'), true);
+    assert.strictEqual(hasAdapter('Freelancer'), true);
+    assert.strictEqual(hasAdapter('Archive.org'), true);
+    assert.strictEqual(hasAdapter('Medium'), true);
+    assert.strictEqual(hasAdapter('Mixcloud'), true);
+    assert.strictEqual(hasAdapter('Dailymotion'), true);
+    assert.strictEqual(hasAdapter('Threads'), true);
     assert.strictEqual(hasAdapter('NonExistentSite123'), false);
   });
 
@@ -21,3 +29,4 @@ describe('Specialized Adapters Registry', () => {
     assert.strictEqual(res, null);
   });
 });
+

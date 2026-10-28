@@ -24,3 +24,4 @@ describe('Investigation Engine Core', () => {
     assert.ok(categories.includes('brasil'));
   });
 });
+

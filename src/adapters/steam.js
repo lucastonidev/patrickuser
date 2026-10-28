@@ -86,3 +86,4 @@ export async function checkSteam(username, options = {}) {
     };
   }
 }
+

@@ -61,3 +61,4 @@ describe('Metadata Parser & OpenGraph Extractor', () => {
     assert.strictEqual(meta.avatarUrl, null);
   });
 });
+

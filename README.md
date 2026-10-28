@@ -210,3 +210,4 @@ Distribuído sob a licença **MIT**. Veja [LICENSE](LICENSE) para mais detalhes.
 <p align="center">
   <i>"No OSINT investigation is complete without keen observation." — PatrickUser Team</i>
 </p>
+

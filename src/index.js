@@ -28,7 +28,23 @@ export {
 
 export {
   hasAdapter,
-  runAdapter
+  runAdapter,
+  checkGitHub,
+  checkReddit,
+  checkDuolingo,
+  checkChess,
+  checkSteam,
+  checkBluesky,
+  checkTabNews,
+  checkGravatar,
+  checkApoiaSe,
+  check500px,
+  checkFreelancer,
+  checkArchiveOrg,
+  checkMedium,
+  checkMixcloud,
+  checkDailymotion,
+  checkThreads
 } from './adapters/index.js';
 
 export {
@@ -41,3 +57,4 @@ export {
   formatMarkdown,
   saveToFile
 } from './cli/exporter.js';
+

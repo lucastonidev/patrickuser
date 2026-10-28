@@ -45,3 +45,4 @@ ${c.cyan('  ~ The Mentalist OSINT Username Hunter (Sherlock Successor) ~')} ${c.
 
   return `${logo}\n${meta}`;
 }
+

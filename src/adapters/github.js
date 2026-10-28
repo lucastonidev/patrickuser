@@ -96,3 +96,4 @@ export async function checkGitHub(username, options = {}) {
     };
   }
 }
+

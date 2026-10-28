@@ -40,3 +40,4 @@ export const c = {
   badgeGold: (text) => (isColorSupported ? `\x1b[48;5;178m\x1b[30m\x1b[1m ${text} \x1b[0m` : `[${text}]`),
   badgeCyan: (text) => (isColorSupported ? `\x1b[48;5;24m\x1b[97m ${text} \x1b[0m` : `[${text}]`)
 };
+

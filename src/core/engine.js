@@ -80,9 +80,78 @@ export async function checkSite(username, site, options = {}) {
     let exists = false;
     let rateLimited = false;
 
-    // Rate limiting detection
-    if (res.status === 429 || (res.status === 403 && (res.text.includes('Cloudflare') || res.text.includes('Attention Required')))) {
-      rateLimited = true;
+    // 1. Detect WAF / Bot / Cloudflare Challenges
+    const isBotChallenge =
+      res.text.includes('Client Challenge') ||
+      res.text.includes('Just a moment...') ||
+      res.text.includes('Attention Required! | Cloudflare') ||
+      res.text.includes('cf-browser-verification') ||
+      res.text.includes('SlardarWAF') ||
+      res.text.includes('_wafchallengeid');
+
+    if (isBotChallenge || res.status === 429 || (res.status === 403 && res.text.includes('Cloudflare'))) {
+      return {
+        site: site.name,
+        category: site.category,
+        exists: false,
+        url: profileUrl,
+        httpStatus: res.status,
+        durationMs,
+        rateLimited: true,
+        error: 'Blocked by Bot Challenge / Cloudflare / WAF'
+      };
+    }
+
+    // 2. Detect Redirection Away (to login, signup, or bouncing back to root domain)
+    let redirectedAway = false;
+    try {
+      const targetPath = new URL(probeUrl).pathname;
+      const finalObj = new URL(res.finalUrl);
+      const finalPath = finalObj.pathname.toLowerCase();
+
+      if (
+        finalPath.includes('/login') ||
+        finalPath.includes('/signin') ||
+        finalPath.includes('/signup') ||
+        finalPath.includes('/register') ||
+        finalPath.includes('/auth') ||
+        finalPath.includes('/session/new')
+      ) {
+        redirectedAway = true;
+      } else if (targetPath.length > 2 && (finalPath === '/' || finalPath === '')) {
+        redirectedAway = true;
+      }
+    } catch {
+      // Ignore URL parse errors
+    }
+
+    // 3. Detect Soft-404 in HTML Title or OpenGraph Title
+    const titleMatch = res.text.match(/<title[^>]*>(.*?)<\/title>/i);
+    const titleText = (titleMatch ? titleMatch[1] : '').toLowerCase();
+    const ogTitleMatch = res.text.match(/<meta\s+[^>]*?(?:property|name)\s*=\s*["']og:title["'][^>]*?content\s*=\s*["']([^"']*)["']/i);
+    const ogTitle = (ogTitleMatch ? ogTitleMatch[1] : '').toLowerCase();
+
+    const isSoft404 =
+      titleText.includes('404 not found') ||
+      titleText.includes('page not found') ||
+      titleText.includes('user not found') ||
+      titleText.includes('profile not found') ||
+      titleText.includes('account not found') ||
+      titleText.includes('this user is unavailable') ||
+      ogTitle.includes('404 not found') ||
+      ogTitle.includes('page not found') ||
+      ogTitle.includes('user not found') ||
+      ogTitle.includes('profile not found');
+
+    if (redirectedAway || isSoft404) {
+      return {
+        site: site.name,
+        category: site.category,
+        exists: false,
+        url: profileUrl,
+        httpStatus: res.status,
+        durationMs
+      };
     }
 
     const errorType = site.errorType || 'status_code';
@@ -95,8 +164,6 @@ export async function checkSite(username, site, options = {}) {
       const hasErrorMsg = msgs.some((m) => m && res.text.includes(m));
       exists = res.status >= 200 && res.status < 400 && !hasErrorMsg;
     } else if (errorType === 'response_url') {
-      // Check if redirected away from expected profile path
-      const redirectedAway = res.finalUrl.endsWith('/') ? res.finalUrl === site.urlMain : false;
       exists = res.status >= 200 && res.status < 300 && !redirectedAway;
     }
 
@@ -257,3 +324,4 @@ export async function huntUsername(rawUsername, options = {}) {
     durationMs: Date.now() - startHuntTime
   };
 }
+

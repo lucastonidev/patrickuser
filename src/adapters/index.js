@@ -9,6 +9,14 @@ import { checkSteam } from './steam.js';
 import { checkBluesky } from './bluesky.js';
 import { checkTabNews } from './tabnews.js';
 import { checkGravatar } from './gravatar.js';
+import { checkApoiaSe } from './apoiase.js';
+import { check500px } from './500px.js';
+import { checkFreelancer } from './freelancer.js';
+import { checkArchiveOrg } from './archiveorg.js';
+import { checkMedium } from './medium.js';
+import { checkMixcloud } from './mixcloud.js';
+import { checkDailymotion } from './dailymotion.js';
+import { checkThreads } from './threads.js';
 
 /**
  * @type {Map<string, function(string, Object): Promise<import('../core/types.js').ServiceResult>>}
@@ -24,6 +32,16 @@ adapters.set('steam', checkSteam);
 adapters.set('bluesky', checkBluesky);
 adapters.set('tabnews', checkTabNews);
 adapters.set('gravatar', checkGravatar);
+adapters.set('apoia.se', checkApoiaSe);
+adapters.set('apoiase', checkApoiaSe);
+adapters.set('500px', check500px);
+adapters.set('freelancer', checkFreelancer);
+adapters.set('archive.org', checkArchiveOrg);
+adapters.set('archiveorg', checkArchiveOrg);
+adapters.set('medium', checkMedium);
+adapters.set('mixcloud', checkMixcloud);
+adapters.set('dailymotion', checkDailymotion);
+adapters.set('threads', checkThreads);
 
 /**
  * Check if a specialized adapter exists for the given site
@@ -55,5 +73,13 @@ export {
   checkSteam,
   checkBluesky,
   checkTabNews,
-  checkGravatar
+  checkGravatar,
+  checkApoiaSe,
+  check500px,
+  checkFreelancer,
+  checkArchiveOrg,
+  checkMedium,
+  checkMixcloud,
+  checkDailymotion,
+  checkThreads
 };

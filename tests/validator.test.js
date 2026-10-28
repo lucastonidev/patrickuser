@@ -27,3 +27,4 @@ describe('Username Validator & Sanitizer', () => {
     assert.strictEqual(validateUsername(null, '^[a-z]+$'), false);
   });
 });
+

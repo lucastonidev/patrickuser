@@ -65,7 +65,7 @@ export async function request(url, options = {}) {
     timeout = 10000,
     redirect = 'follow',
     signal: externalSignal,
-    maxBytes = 524288
+    maxBytes = 1572864 // 1.5MB max payload to capture full metadata on large pages
   } = options;
 
   const controller = new AbortController();
@@ -137,3 +137,4 @@ export async function request(url, options = {}) {
     }
   }
 }
+

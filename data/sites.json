@@ -61,8 +61,8 @@
     "name": "Hashnode",
     "url": "https://hashnode.com/@{}",
     "category": "tech",
-    "errorType": "status_code",
-    "errorCode": 404,
+    "errorType": "message",
+    "errorMsg": ["User not found | Hashnode", "User not found", "404"],
     "regexCheck": "^[a-zA-Z0-9_\\-]+$"
   },
   {
@@ -77,16 +77,16 @@
     "name": "Replit",
     "url": "https://replit.com/@{}",
     "category": "tech",
-    "errorType": "status_code",
-    "errorCode": 404,
+    "errorType": "message",
+    "errorMsg": ["Sign Up - Replit", "Sign Up", "User not found"],
     "regexCheck": "^[a-zA-Z0-9_]+$"
   },
   {
     "name": "Codecademy",
     "url": "https://www.codecademy.com/profiles/{}",
     "category": "tech",
-    "errorType": "status_code",
-    "errorCode": 404,
+    "errorType": "message",
+    "errorMsg": ["Profile Not Found | Codecademy", "Profile Not Found", "404"],
     "regexCheck": "^[a-zA-Z0-9_\\-]+$"
   },
   {
@@ -176,7 +176,7 @@
     "url": "https://x.com/{}",
     "category": "social",
     "errorType": "message",
-    "errorMsg": ["This account doesn’t exist", "Account suspended", "page doesn’t exist"],
+    "errorMsg": ["This account doesn’t exist", "Account suspended", "Page not found / X", "page doesn’t exist"],
     "regexCheck": "^[a-zA-Z0-9_]{1,15}$"
   },
   {
@@ -195,14 +195,6 @@
     "errorType": "status_code",
     "errorCode": 404,
     "regexCheck": "^[a-zA-Z0-9_]+$"
-  },
-  {
-    "name": "Telegram",
-    "url": "https://t.me/{}",
-    "category": "social",
-    "errorType": "message",
-    "errorMsg": ["If you have <strong>Telegram</strong>, you can contact <a class=\"tgme_action_button_new", "tgme_page_extra\">preview channel"],
-    "regexCheck": "^[a-zA-Z0-9_]{5,32}$"
   },
   {
     "name": "Pinterest",
@@ -258,14 +250,15 @@
     "category": "social",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_.]+$"
+    "regexCheck": "^[a-zA-Z0-9_.]+$",
+    "hasAdapter": true
   },
   {
     "name": "Instagram",
     "url": "https://www.instagram.com/{}/",
     "category": "social",
     "errorType": "message",
-    "errorMsg": ["Sorry, this page isn't available", "The link you followed may be broken"],
+    "errorMsg": ["Sorry, this page isn't available", "The link you followed may be broken", "<title>Instagram</title>"],
     "regexCheck": "^[a-zA-Z0-9_.]+$"
   },
   {
@@ -273,7 +266,7 @@
     "url": "https://www.tiktok.com/@{}",
     "category": "social",
     "errorType": "message",
-    "errorMsg": ["Couldn't find this account", "This account is private or does not exist"],
+    "errorMsg": ["Couldn't find this account", "This account is private or does not exist", "SlardarWAF", "_wafchallengeid"],
     "regexCheck": "^[a-zA-Z0-9_.]+$"
   },
   {
@@ -297,7 +290,7 @@
     "url": "https://www.twitch.tv/{}",
     "category": "gaming",
     "errorType": "message",
-    "errorMsg": ["content is unavailable", "Unless you’ve got a time machine, that content is unavailable"],
+    "errorMsg": ["content is unavailable", "Unless you’ve got a time machine, that content is unavailable", "<title>Twitch</title>"],
     "regexCheck": "^[a-zA-Z0-9_]{4,25}$"
   },
   {
@@ -383,14 +376,6 @@
     "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
   },
   {
-    "name": "Spotify",
-    "url": "https://open.spotify.com/user/{}",
-    "category": "content",
-    "errorType": "status_code",
-    "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
-  },
-  {
     "name": "SoundCloud",
     "url": "https://soundcloud.com/{}",
     "category": "content",
@@ -412,7 +397,8 @@
     "category": "content",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$",
+    "hasAdapter": true
   },
   {
     "name": "Substack",
@@ -436,7 +422,8 @@
     "category": "content",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$",
+    "hasAdapter": true
   },
   {
     "name": "Goodreads",
@@ -468,7 +455,8 @@
     "category": "content",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$",
+    "hasAdapter": true
   },
   {
     "name": "Wattpad",
@@ -484,7 +472,8 @@
     "category": "content",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$",
+    "hasAdapter": true
   },
   {
     "name": "Duolingo",
@@ -524,7 +513,8 @@
     "category": "professional",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_\\-]+$"
+    "regexCheck": "^[a-zA-Z0-9_\\-]+$",
+    "hasAdapter": true
   },
   {
     "name": "DeviantArt",
@@ -540,7 +530,8 @@
     "category": "professional",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_]+$"
+    "regexCheck": "^[a-zA-Z0-9_]+$",
+    "hasAdapter": true
   },
   {
     "name": "Upwork",
@@ -591,14 +582,6 @@
     "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
   },
   {
-    "name": "Skoob",
-    "url": "https://www.skoob.com.br/usuario/{}",
-    "category": "brasil",
-    "errorType": "message",
-    "errorMsg": ["Ops! Usuário não encontrado", "Página não encontrada"],
-    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
-  },
-  {
     "name": "Filmow",
     "url": "https://filmow.com/usuario/{}/",
     "category": "brasil",
@@ -618,8 +601,7 @@
     "name": "Vakinha",
     "url": "https://www.vakinha.com.br/usuario/{}",
     "category": "brasil",
-    "errorType": "status_code",
-    "errorCode": 404,
+    "errorType": "response_url",
     "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
   },
   {
@@ -628,6 +610,7 @@
     "category": "brasil",
     "errorType": "status_code",
     "errorCode": 404,
-    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$"
+    "regexCheck": "^[a-zA-Z0-9_\\-\\.]+$",
+    "hasAdapter": true
   }
 ]
