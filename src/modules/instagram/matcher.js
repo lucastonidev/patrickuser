@@ -161,7 +161,9 @@ export function calculateMatchScore(target = {}, discovered = {}) {
     maskedEmail = '',
     maskedPhone = '',
     fullName: discoveredFullName = '',
-    handle = ''
+    handle = '',
+    bioEmails = [],
+    bioPhones = []
   } = discovered;
 
   const checks = [];
@@ -172,7 +174,20 @@ export function calculateMatchScore(target = {}, discovered = {}) {
   let emailScore = 0;
   const emailPassed = [];
 
-  if (targetEmail && maskedEmail && targetEmail.includes('@') && maskedEmail.includes('@')) {
+  // 1A. Exact match with public commercial emails extracted from profile bio or links
+  const targetEmailLower = targetEmail.toLowerCase().trim();
+  const exactBioEmail = Array.isArray(bioEmails) && bioEmails.find(e => e.toLowerCase().trim() === targetEmailLower);
+
+  if (targetEmail && exactBioEmail) {
+    emailScore = 40;
+    emailPassed.push('FIRST_LETTER', 'LAST_LETTER', 'USER_LENGTH', 'DOMAIN_MATCH', 'EXACT_BIO_MATCH');
+    checks.push({
+      factor: 'Email: Coincidência Exata (Bio/Contatos)',
+      passed: true,
+      points: 40,
+      detail: `Alvo '${targetEmail}' coincide 100% com e-mail público identificado na bio`
+    });
+  } else if (targetEmail && maskedEmail && targetEmail.includes('@') && maskedEmail.includes('@')) {
     const tParts = parseEmailParts(targetEmail);
     const mParts = parseEmailParts(maskedEmail);
 
@@ -227,6 +242,13 @@ export function calculateMatchScore(target = {}, discovered = {}) {
       points: domainMatch ? 10 : 0,
       detail: `Alvo: '@${tParts.domain}' | Máscara: '@${mParts.domain}'`
     });
+  } else if (targetEmail) {
+    checks.push({
+      factor: 'Email: Máscara de Recuperação',
+      passed: false,
+      points: 0,
+      detail: 'Máscara não disponível ou protegida pelo Instagram'
+    });
   }
 
   // ==========================================================================
@@ -235,7 +257,22 @@ export function calculateMatchScore(target = {}, discovered = {}) {
   let phoneScore = 0;
   const phonePassed = [];
 
-  if (targetPhone && maskedPhone) {
+  const cleanTargetPhone = cleanDigits(targetPhone);
+  const exactBioPhone = Array.isArray(bioPhones) && cleanTargetPhone.length >= 8 && bioPhones.find(p => {
+    const cp = cleanDigits(p);
+    return cp.endsWith(cleanTargetPhone.slice(-8)) || cleanTargetPhone.endsWith(cp.slice(-8));
+  });
+
+  if (targetPhone && exactBioPhone) {
+    phoneScore = 30;
+    phonePassed.push('DDI', 'TRAILING_DIGITS', 'EXACT_BIO_MATCH');
+    checks.push({
+      factor: 'Telefone: Coincidência Exata (WhatsApp/Bio)',
+      passed: true,
+      points: 30,
+      detail: `Alvo '${targetPhone}' coincide 100% com telefone/WhatsApp público na bio`
+    });
+  } else if (targetPhone && maskedPhone) {
     const cleanTarget = cleanDigits(targetPhone);
     const maskHas55 = maskedPhone.includes('+55') || maskedPhone.startsWith('55');
     const targetHas55 = targetPhone.includes('+55') || cleanTarget.startsWith('55');

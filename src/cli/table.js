@@ -144,14 +144,47 @@ export function printInstagramHit(hit) {
     }
   }
 
-  // Obfuscated recovery contacts
-  if (hit.recovery) {
-    const rec = hit.recovery;
+  // Contacts: Obfuscated Recovery Masks & Public Contacts ("somente o resto apresentado")
+  const rec = hit.recovery;
+  const bioEnt = hit.forensics?.bioEntities;
+  const contactLines = [];
+
+  // 1. Partial/Obfuscated recovery masks (from Instagram recovery / mobile API)
+  if (rec && (rec.maskedEmail || rec.maskedPhone)) {
     const recParts = [];
-    if (rec.maskedEmail) recParts.push(`${c.dim('Email Ofuscado:')} ${c.neonGreen(rec.maskedEmail)}`);
-    if (rec.maskedPhone) recParts.push(`${c.dim('Telefone Ofuscado:')} ${c.gold(rec.maskedPhone)}`);
+    if (rec.maskedEmail) recParts.push(`${c.dim('Email (Parcial/Ofuscado):')} ${c.neonGreen(c.bold(rec.maskedEmail))}`);
+    if (rec.maskedPhone) recParts.push(`${c.dim('Telefone (Parcial/Ofuscado):')} ${c.gold(c.bold(rec.maskedPhone))}`);
     if (recParts.length > 0) {
-      console.log(`    ${c.darkGray('↳')} ${recParts.join(c.darkGray(' · '))}`);
+      contactLines.push(`    ${c.darkGray('↳')} ${c.badgeGold('RECUPERAÇÃO')} ${recParts.join(c.darkGray(' · '))}`);
+    }
+  }
+
+  // 2. Public contacts parsed from Bio & External Link
+  if (bioEnt && (bioEnt.emails?.length > 0 || bioEnt.whatsapp?.length > 0)) {
+    const pubParts = [];
+    if (bioEnt.whatsapp.length > 0) pubParts.push(`${c.dim('WhatsApp/Tel:')} ${c.neonGreen(c.bold(bioEnt.whatsapp.join(', ')))}`);
+    if (bioEnt.emails.length > 0) pubParts.push(`${c.dim('Email:')} ${c.white(c.bold(bioEnt.emails.join(', ')))}`);
+    if (pubParts.length > 0) {
+      contactLines.push(`    ${c.darkGray('↳')} ${c.dim('📞 Contatos Públicos:')} ${pubParts.join(c.darkGray(' · '))}`);
+    }
+  }
+
+  if (contactLines.length > 0) {
+    contactLines.forEach(l => console.log(l));
+  } else {
+    console.log(`    ${c.darkGray('↳')} ${c.dim('Contatos (Email/Telefone):')} ${c.darkGray('Ocultos na bio (use --session para puxar máscaras de recuperação)')}`);
+  }
+
+  // 3. Email Filter & Correlation Details
+  if (hit.match?.checks?.length > 0) {
+    const emailChecks = hit.match.checks.filter(chk => chk.factor.startsWith('Email:'));
+    if (emailChecks.length > 0) {
+      const anyPassed = emailChecks.some(chk => chk.passed);
+      const statusLabel = anyPassed ? c.neonGreen(c.bold('COINCIDENTE')) : c.dim('NÃO COINCIDENTE');
+      const details = emailChecks
+        .map(chk => chk.passed ? c.neonGreen(`[✓ ${chk.factor.replace('Email: ', '')}]`) : c.dim(`[✗ ${chk.factor.replace('Email: ', '')}]`))
+        .join(' ');
+      console.log(`    ${c.darkGray('↳')} ${c.dim('Filtro Email:')} ${statusLabel} ${details}`);
     }
   }
 
@@ -161,34 +194,21 @@ export function printInstagramHit(hit) {
     console.log(`    ${c.darkGray('↳')} ${c.dim('Meta PK:')} ${c.white(age.numericId)} ${c.darkGray('·')} ${c.dim('Criação Estimada:')} ${c.gold(age.estimatedYears)} ${c.dim(`(${age.era})`)}`);
   }
 
-  // Forensics: Bio Entities (WhatsApp, Pix, Commercial Email)
-  const bioEnt = hit.forensics?.bioEntities;
+  // Forensics: Bio Pix
   if (bioEnt) {
-    const entParts = [];
-    if (bioEnt.whatsapp.length > 0) {
-      entParts.push(`${c.dim('WhatsApp:')} ${c.neonGreen(bioEnt.whatsapp.join(', '))}`);
-    }
-    if (bioEnt.pix.cpfs.length > 0) {
-      entParts.push(`${c.dim('Pix CPF:')} ${c.cyan(bioEnt.pix.cpfs.join(', '))}`);
-    }
-    if (bioEnt.pix.cnpjs.length > 0) {
-      entParts.push(`${c.dim('Pix CNPJ:')} ${c.cyan(bioEnt.pix.cnpjs.join(', '))}`);
-    }
-    if (bioEnt.pix.evp.length > 0) {
-      entParts.push(`${c.dim('Pix EVP:')} ${c.cyan(bioEnt.pix.evp.join(', '))}`);
-    }
-    if (bioEnt.emails.length > 0) {
-      entParts.push(`${c.dim('Email na Bio:')} ${c.white(bioEnt.emails.join(', '))}`);
-    }
-    if (entParts.length > 0) {
-      console.log(`    ${c.darkGray('↳')} ${c.bold(c.gold('Forensics Bio:'))} ${entParts.join(c.darkGray(' · '))}`);
+    const pixParts = [];
+    if (bioEnt.pix.cpfs.length > 0) pixParts.push(`${c.dim('Pix CPF:')} ${c.cyan(bioEnt.pix.cpfs.join(', '))}`);
+    if (bioEnt.pix.cnpjs.length > 0) pixParts.push(`${c.dim('Pix CNPJ:')} ${c.cyan(bioEnt.pix.cnpjs.join(', '))}`);
+    if (bioEnt.pix.evp.length > 0) pixParts.push(`${c.dim('Pix EVP:')} ${c.cyan(bioEnt.pix.evp.join(', '))}`);
+    if (pixParts.length > 0) {
+      console.log(`    ${c.darkGray('↳')} ${c.bold(c.gold('Pix Bio:'))} ${pixParts.join(c.darkGray(' · '))}`);
     }
   }
 
   // Reverse Image Search
   if (hit.forensics?.reverseImageSearch?.googleLens) {
     const rev = hit.forensics.reverseImageSearch;
-    console.log(`    ${c.darkGray('↳')} ${c.dim('Busca Reversa:')} ${c.underline(c.sky(`[Google Lens]`))} ${c.darkGray('·')} ${c.underline(c.sky(`[Yandex]`))} ${c.darkGray('·')} ${c.underline(c.sky(`[Bing]`))}`);
+    console.log(`    ${c.darkGray('↳')} ${c.dim('Busca Reversa Foto:')} ${c.underline(c.sky(`[Google Lens]`))} ${c.darkGray('·')} ${c.underline(c.sky(`[Yandex]`))} ${c.darkGray('·')} ${c.underline(c.sky(`[Bing]`))}`);
   }
 }
 
@@ -209,15 +229,21 @@ export function printInstagramSummary(results) {
     matches,
     highCertaintyMatches,
     mediumCertaintyMatches,
+    emailFilteredMatches = [],
+    emailFilterActive = false,
     durationMs
   } = results;
 
   console.log(`\n${c.darkGray('────────────────────────────────────────────────────────────────────────────')}`);
   console.log(` ${c.badgeGold('INSTAGRAM FORENSIC SUMMARY (YESITSME ENGINE)')}`);
-  console.log(` ${c.dim('Alvo:')} ${c.bold(c.white(target.nome || target.username || 'N/A'))} ${target.profissao ? c.dim(`(${target.profissao})`) : ''}`);
-  if (target.email) console.log(` ${c.dim('E-mail Alvo:')} ${c.cyan(target.email)}`);
+  const targetLabel = target.username ? `@${target.username}` : (target.nome || 'N/A');
+  console.log(` ${c.dim('Alvo:')} ${c.bold(c.white(targetLabel))} ${target.profissao ? c.dim(`(${target.profissao})`) : ''}`);
+  if (target.email) console.log(` ${c.dim('E-mail Alvo (Filtro):')} ${c.cyan(target.email)}`);
   if (target.telefone) console.log(` ${c.dim('Telefone Alvo:')} ${c.gold(target.telefone)}`);
-  console.log(` ${c.dim('Permutações:')} ${c.white(String(totalPermutations))} ${c.dim('·')} ${c.dim('Consultados:')} ${c.white(String(checkedCount))} ${c.dim('·')} ${c.dim('Perfis Encontrados:')} ${c.neonGreen(String(foundCount))}`);
+  console.log(` ${c.dim('Consultados:')} ${c.white(String(checkedCount))} ${c.dim('·')} ${c.dim('Perfis Encontrados:')} ${c.neonGreen(String(foundCount))}`);
+  if (emailFilterActive) {
+    console.log(` ${c.dim('Filtro de Email:')} ${c.cyan(target.email)} ${c.darkGray('·')} ${c.dim('Coincidências:')} ${emailFilteredMatches.length > 0 ? c.neonGreen(c.bold(String(emailFilteredMatches.length))) : c.dim('0')} ${c.dim(`de ${foundCount} perfis`)}`);
+  }
   console.log(` ${c.dim('Alta Certeza (>=75%):')} ${c.neonGreen(c.bold(String(highCertaintyMatches.length)))} ${c.dim('·')} ${c.dim('Média Certeza (45-74%):')} ${c.amber(String(mediumCertaintyMatches.length))} ${c.dim('·')} ${c.dim('Duração:')} ${c.white((durationMs / 1000).toFixed(2) + 's')}`);
 
   const hasRecoveryMask = matches.some((m) => m.recovery?.maskedEmail || m.recovery?.maskedPhone);
@@ -225,7 +251,7 @@ export function printInstagramSummary(results) {
     console.log(`\n ${c.cyan('ℹ')} ${c.dim('Nota sobre E-mail/Telefone Ofuscados:')}`);
     console.log(`   ${c.dim('O Instagram protege as máscaras de recuperação contra requisições anônimas.')}`);
     console.log(`   ${c.dim('Para extrair máscaras ofuscadas completas (como no YesItsMe original), use:')}`);
-    console.log(`   ${c.gold('rimuuser insta --nome "..." --session <seu_sessionid>')} ${c.dim('ou configure')} ${c.cyan('export IG_SESSION_ID=<cookie>')}`);
+    console.log(`   ${c.gold('patrickuser insta @usuario --session <seu_sessionid>')} ${c.dim('ou configure')} ${c.cyan('export IG_SESSION_ID=<cookie>')}`);
   }
   console.log(`${c.darkGray('────────────────────────────────────────────────────────────────────────────')}\n`);
 }

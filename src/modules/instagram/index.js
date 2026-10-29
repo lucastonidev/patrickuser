@@ -166,13 +166,18 @@ export async function investigateInstagram(params = {}, options = {}) {
       let recoveryResult = null;
 
       try {
-        // Run profile recon and recovery lookup in parallel
-        const [prof, rec] = await Promise.all([
-          reconInstagramProfile(handle, { timeout, sessionId, mockData }),
-          lookupAccountRecovery(handle, { timeout, csrfToken, mockRecovery })
-        ]);
+        // Run profile recon first to capture user PK, then recovery lookup with session and PK
+        const prof = await reconInstagramProfile(handle, { timeout, sessionId, mockData });
         profileResult = prof;
-        recoveryResult = rec;
+
+        const userId = prof?.profile?.id || null;
+        recoveryResult = await lookupAccountRecovery(handle, {
+          timeout,
+          csrfToken,
+          sessionId,
+          userId,
+          mockRecovery
+        });
       } catch {
         // Resilience against unexpected socket drops
       }
@@ -187,21 +192,29 @@ export async function investigateInstagram(params = {}, options = {}) {
         const maskedPhone = recoveryResult?.maskedPhone || '';
         const fullName = profileResult?.profile?.fullName || '';
 
-        // Calculate probabilistic match score
-        const match = calculateMatchScore(
-          { email: targetEmail, telefone: targetPhone, nome: targetNome },
-          { maskedEmail, maskedPhone, fullName, handle }
-        );
-
         // Forensic extractions
         const pk = profileResult?.profile?.id || '';
         const bio = profileResult?.profile?.biography || '';
         const avatar = profileResult?.profile?.avatarUrl || '';
+        const externalUrl = profileResult?.profile?.externalUrl || '';
 
         const estimatedAge = estimateAccountAge(pk);
-        const bioEntities = extractBioEntities(bio);
+        const bioEntities = extractBioEntities(`${bio} ${externalUrl}`);
         const reverseImageSearch = generateReverseImageSearchUrls(avatar);
         const crossSocialLinks = generateCrossSocialLinks(handle);
+
+        // Calculate probabilistic match score (including bio emails/phones)
+        const match = calculateMatchScore(
+          { email: targetEmail, telefone: targetPhone, nome: targetNome },
+          {
+            maskedEmail,
+            maskedPhone,
+            fullName,
+            handle,
+            bioEmails: bioEntities.emails,
+            bioPhones: bioEntities.whatsapp
+          }
+        );
 
         finding = {
           handle,
@@ -257,6 +270,11 @@ export async function investigateInstagram(params = {}, options = {}) {
   const mediumCertaintyMatches = foundResults.filter(r => r.match.certainty === 'MEDIUM');
   const lowCertaintyMatches = foundResults.filter(r => r.match.certainty === 'LOW');
 
+  // Filter candidates specifically matching target email (breakdown score > 0 or handle root match)
+  const emailFilteredMatches = targetEmail
+    ? foundResults.filter(r => (r.match?.breakdown?.email?.score || 0) > 0 || (r.match?.breakdown?.handle?.score || 0) > 0)
+    : [];
+
   return {
     target: {
       nome: targetNome,
@@ -272,6 +290,8 @@ export async function investigateInstagram(params = {}, options = {}) {
     highCertaintyMatches,
     mediumCertaintyMatches,
     lowCertaintyMatches,
+    emailFilteredMatches,
+    emailFilterActive: Boolean(targetEmail),
     durationMs: Date.now() - startTime
   };
 }

@@ -154,7 +154,7 @@ export function parseInstagramHtml(html, cleanHandle) {
   const isVerified = /"is_verified":true/.test(html);
   const isPrivate = /"is_private":true/.test(html);
 
-  // External URL
+  // External URL & Bio Links
   let externalUrl = '';
   const extUrlMatch = html.match(/"external_url":"([^"]*)"/);
   if (extUrlMatch) {
@@ -162,6 +162,19 @@ export function parseInstagramHtml(html, cleanHandle) {
       externalUrl = JSON.parse('"' + extUrlMatch[1] + '"');
     } catch {
       externalUrl = extUrlMatch[1];
+    }
+  }
+
+  // Check bio_links array if external_url is absent
+  if (!externalUrl) {
+    const bioLinksMatch = html.match(/"bio_links":(\[[^\]]*\])/);
+    if (bioLinksMatch) {
+      try {
+        const bioLinks = JSON.parse(bioLinksMatch[1]);
+        if (Array.isArray(bioLinks) && bioLinks[0]?.url) {
+          externalUrl = bioLinks[0].url;
+        }
+      } catch {}
     }
   }
 
@@ -394,6 +407,39 @@ export async function lookupAccountRecovery(usernameOrEmail, options = {}) {
       message: mock.message || 'Recovery lookup succeeded (mock)',
       rateLimited: false
     };
+  }
+
+  // 0. Toutatis-style Mobile User Info Lookup (when sessionId and userId are available)
+  const userId = options.userId || null;
+  if (sessionId && userId) {
+    try {
+      const infoRes = await request(`https://i.instagram.com/api/v1/users/${userId}/info/`, {
+        headers: {
+          'User-Agent': 'Instagram 278.0.0.19.115 Android',
+          'Cookie': `sessionid=${sessionId};`,
+          'x-ig-app-id': WEB_APP_ID
+        },
+        timeout
+      });
+
+      if (infoRes.status === 200) {
+        const json = JSON.parse(infoRes.text);
+        const user = json?.user;
+        const maskedEmail = user?.obfuscated_email || user?.public_email || null;
+        const maskedPhone = user?.obfuscated_phone || user?.contact_phone_number || user?.public_phone_number || null;
+
+        if (maskedEmail || maskedPhone) {
+          return {
+            success: true,
+            maskedEmail,
+            maskedPhone,
+            contactPoint: user?.contact_point || null,
+            message: 'Máscara de contato obtida via Mobile User Info',
+            rateLimited: false
+          };
+        }
+      }
+    } catch {}
   }
 
   // 1. YesItsMe Mobile HMAC Signed Lookup

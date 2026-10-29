@@ -347,5 +347,55 @@ describe('Instagram Engine: Full Investigation Pipeline', () => {
     const sig = generateInstagramSignature(JSON.stringify({ q: 'natgeo' }));
     assert.ok(sig.startsWith('ig_sig_key_version=4&signed_body='));
   });
+
+  test('probes direct handle/nick immediately with 1 single candidate when username is specified', async () => {
+    const mockData = {
+      'rafaeltoniato.adv': {
+        id: '54088204289',
+        username: 'rafaeltoniato.adv',
+        fullName: 'Rafael Toniato',
+        biography: 'Advocacia e Consultoria Juridica contato@toniato.adv.br',
+        avatarUrl: 'https://cdn.instagram.com/avatar.jpg',
+        followers: 796,
+        following: 1453,
+        postsCount: 116,
+        isPrivate: false,
+        isVerified: true
+      }
+    };
+
+    const res = await investigateInstagram({
+      username: 'rafaeltoniato.adv',
+      email: 'contato@toniato.adv.br'
+    }, {
+      mockData
+    });
+
+    assert.strictEqual(res.totalPermutations, 1);
+    assert.strictEqual(res.checkedCount, 1);
+    assert.strictEqual(res.foundCount, 1);
+    assert.strictEqual(res.matches[0].handle, 'rafaeltoniato.adv');
+    assert.strictEqual(res.matches[0].profile.fullName, 'Rafael Toniato');
+    assert.ok(res.matches[0].forensics.bioEntities.emails.includes('contato@toniato.adv.br'));
+    // Email match with bio
+    assert.ok(res.matches[0].match.breakdown.email.score === 40);
+    assert.strictEqual(res.emailFilterActive, true);
+    assert.strictEqual(res.emailFilteredMatches.length, 1);
+  });
+
+  test('matcher correlates public bio email and handles correctly', () => {
+    const score = calculateMatchScore(
+      { email: 'advogado@justica.com.br' },
+      {
+        handle: 'advogado.silva',
+        bioEmails: ['advogado@justica.com.br'],
+        fullName: 'Dr Silva'
+      }
+    );
+
+    assert.strictEqual(score.breakdown.email.score, 40);
+    assert.ok(score.score >= 50);
+    assert.ok(score.certainty === 'MEDIUM' || score.certainty === 'HIGH');
+  });
 });
 

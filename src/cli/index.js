@@ -37,20 +37,22 @@ ${c.gold('General OSINT Options:')}
 
 ${c.gold('Instagram Engine Options (insta / instagram):')}
   --nome, -n <string>       Target full or partial name (e.g. "Carlos Silva")
+  --nick, -u <handle>       Direct Instagram username/nick to probe (e.g. @rafaeltoniato.adv)
+  --username <handle>       Alias for --nick
   --prof <string>           Profession or segment (e.g. adv, med, psi, dev)
-  --email, -m <email>       Suspected email to correlate with obfuscated mask
+  --email, -m <email>       Suspected email to filter and correlate with contact masks
   --telefone, -t <phone>    Suspected phone to correlate with obfuscated mask
-  --username, -u <handle>   Direct Instagram username to probe
   --ano <year>              Birth year for permutation generation (e.g. 1990)
   --cidade <city>           City or state abbreviation (e.g. SP, Rio)
-  --limit, -l <number>      Max permutations to scan (default: 40)
-  --session <id>            Optional Instagram sessionid cookie
+  --limit, -l <number>      Max permutations to scan when using --nome (default: 40)
+  --session <id>            Optional Instagram sessionid cookie for private recovery masks
 
 ${c.gold('Examples:')}
   npx patrickuser john_doe
   npx patrickuser lucas --category tech,brasil
-  rimuuser insta --nome "Carlos Silva" --prof adv --email "carlos@gmail.com"
-  rimuuser insta --nome "Lucas Pereira" --telefone "+55 11 98765-4321" --json
+  npx patrickuser insta @rafaeltoniato.adv
+  npx patrickuser insta @davitoria_adv --email adv@gmail.com
+  npx patrickuser insta --nome "Carlos Silva" --prof adv --email "carlos@gmail.com"
   npx patrickuser --server -p 8080
 `;
 
@@ -83,6 +85,7 @@ export async function runCli(argv = process.argv.slice(2)) {
     telefone: { type: 'string', short: 't' },
     phone: { type: 'string' },
     username: { type: 'string', short: 'u' },
+    nick: { type: 'string' },
     handle: { type: 'string' },
     limit: { type: 'string', short: 'l' },
     ano: { type: 'string' },
@@ -144,31 +147,66 @@ export async function runCli(argv = process.argv.slice(2)) {
     return;
   }
 
-  // Instagram Engine Subcommand Mode (insta / instagram or --nome flag)
-  const isInsta = positionals[0] === 'insta' || positionals[0] === 'instagram' || Boolean(values.nome || values.name);
+  // Instagram Engine Subcommand Mode (insta / instagram, or --nome / --nick / --username flag)
+  const isInsta = positionals[0] === 'insta' || positionals[0] === 'instagram' || Boolean(values.nome || values.name || values.nick || values.username || values.handle);
   if (isInsta) {
     const isSilentJson = Boolean(values.json && !values.output);
-    const targetNome = values.nome || values.name || (positionals[0] !== 'insta' && positionals[0] !== 'instagram' ? positionals[0] : (positionals[1] || ''));
+
+    // Identify positional target when running: patrickuser insta <arg>
+    const rawPositional = (positionals[0] === 'insta' || positionals[0] === 'instagram')
+      ? (positionals[1] || '')
+      : (positionals[0] || '');
+
+    // Detect if the positional argument is a direct username / nick:
+    // Starts with '@' or has no spaces and consists of valid Instagram handle chars
+    const isExplicitHandle = rawPositional.startsWith('@');
+    const isLikelyHandle = Boolean(rawPositional && !rawPositional.includes(' ') && /^[a-zA-Z0-9._]+$/.test(rawPositional.replace(/^@/, '')));
+    const isHandlePattern = isExplicitHandle || isLikelyHandle;
+
+    let targetUsername = values.username || values.handle || values.nick || '';
+    let targetNome = values.nome || values.name || '';
+
+    if (!targetUsername && !targetNome && rawPositional) {
+      if (isHandlePattern) {
+        targetUsername = rawPositional.replace(/^@+/, '');
+      } else {
+        targetNome = rawPositional;
+      }
+    } else if (!targetUsername && rawPositional && isExplicitHandle) {
+      targetUsername = rawPositional.replace(/^@+/, '');
+    } else if (!targetNome && rawPositional && !isHandlePattern && !targetUsername) {
+      targetNome = rawPositional;
+    }
+
+    // Clean any leading @ in direct username
+    if (targetUsername) {
+      targetUsername = targetUsername.replace(/^@+/, '').trim();
+    }
+
     const targetProf = values.prof || values.profissao || values.profession || '';
     const targetEmail = values.email || '';
     const targetPhone = values.telefone || values.phone || '';
-    const targetUsername = values.username || values.handle || '';
     const targetLimit = values.limit ? parseInt(values.limit, 10) : 40;
     const concurrency = values.concurrency ? parseInt(values.concurrency, 10) : 10;
     const timeout = values.timeout ? parseInt(values.timeout, 10) : 6000;
 
     if (!targetNome && !targetUsername && !targetEmail && !targetPhone) {
       if (!isSilentJson) console.log(getBanner());
-      console.error(`\n${c.redJohn('Parâmetros insuficientes:')} Forneça ao menos --nome, --username, --email ou --telefone para investigar no Instagram.`);
-      console.log(`\n${c.gold('Exemplo:')}\n  rimuuser insta --nome "Carlos Silva" --prof adv --email "carlos@gmail.com"\n`);
+      console.error(`\n${c.redJohn('Parâmetros insuficientes:')} Forneça ao menos um nome, username/nick (@usuario), --email ou --telefone para investigar no Instagram.`);
+      console.log(`\n${c.gold('Exemplos:')}\n  patrickuser insta @rafaeltoniato.adv\n  patrickuser insta @davitoria_adv --email adv@gmail.com\n  patrickuser insta --nome "Carlos Silva" --prof adv --email "carlos@gmail.com"\n`);
       process.exit(1);
     }
 
     if (!isSilentJson) {
       console.log(getBanner());
-      console.log(`\n ${c.badgeGold('INSTAGRAM RECON (YESITSME ENGINE)')} ${c.bold(c.white(targetNome || targetUsername))} ${c.dim('— Gerando permutações e coletando dados públicos...')}\n`);
+      const displayLabel = targetUsername ? `@${targetUsername}` : targetNome;
+      const scanType = targetUsername && !targetNome
+        ? '— Verificação Direta de Conta e Extração Forense...'
+        : '— Gerando permutações e coletando dados públicos...';
+      console.log(`\n ${c.badgeGold('INSTAGRAM RECON (YESITSME ENGINE)')} ${c.bold(c.white(displayLabel))} ${c.dim(scanType)}\n`);
+      if (targetNome && targetUsername) console.log(`   ${c.dim('• Nome Base:')} ${c.white(targetNome)}`);
       if (targetProf) console.log(`   ${c.dim('• Profissão/Segmento:')} ${c.amber(targetProf)}`);
-      if (targetEmail) console.log(`   ${c.dim('• Email Alvo:')} ${c.cyan(targetEmail)}`);
+      if (targetEmail) console.log(`   ${c.dim('• Email Alvo (Filtro):')} ${c.cyan(targetEmail)}`);
       if (targetPhone) console.log(`   ${c.dim('• Telefone Alvo:')} ${c.gold(targetPhone)}`);
       console.log();
     }
