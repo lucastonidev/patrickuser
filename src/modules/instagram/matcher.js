@@ -418,3 +418,4 @@ export function calculateMatchScore(target = {}, discovered = {}) {
     checks
   };
 }
+

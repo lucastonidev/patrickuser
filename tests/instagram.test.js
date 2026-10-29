@@ -314,3 +314,4 @@ describe('Instagram Engine: Full Investigation Pipeline', () => {
     assert.ok(perms.includes('ana.souza'));
   });
 });
+

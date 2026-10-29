@@ -434,3 +434,4 @@ export function generateHandlePermutations(criteria = {}) {
 
   return results.slice(0, limite).map(r => r.handle);
 }
+

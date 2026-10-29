@@ -300,3 +300,4 @@ export class InstagramEngine {
     return lookupAccountRecovery(usernameOrEmail, { ...this.defaultOptions, ...options });
   }
 }
+

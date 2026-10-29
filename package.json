@@ -1,9 +1,18 @@
 {
   "name": "patrickuser",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The Mentalist OSINT platform - Observational username hunter & Sherlock successor in 100% native Node.js ESM with rich metadata extraction",
   "type": "module",
   "main": "./src/index.js",
+  "files": [
+    "bin",
+    "src",
+    "data",
+    "README.md",
+    "README.en.md",
+    "README.es.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": "./src/index.js",
     "./engine": "./src/core/engine.js",
@@ -23,7 +32,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/patrickuser/patrickuser"
+    "url": "https://github.com/lucastonidev/patrickuser.git"
   },
   "keywords": [
     "osint",

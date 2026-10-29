@@ -2,7 +2,16 @@
  * @file banner.js - Patrick Jane & Red John Themed ASCII Banner
  * Dynamically scales and centers to terminal width with blood-red ANSI styling.
  */
+import { readFileSync } from 'node:fs';
 import { c } from './colors.js';
+
+export let appVersion = '1.1.0';
+try {
+  const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf-8'));
+  if (pkg.version) appVersion = pkg.version;
+} catch {
+  // fallback
+}
 
 const MENTALIST_QUOTES = [
   "Tyger Tyger, burning bright, In the forests of the night... — Red John",
@@ -156,7 +165,7 @@ export function getBanner() {
   const padMeta = Math.max(0, Math.floor((termWidth - 75) / 2));
   const indentMeta = ' '.repeat(padMeta);
 
-  const metaLine = `${indentMeta} ${c.badgeRed('RED JOHN MARK')} ${c.dim('Version:')} ${c.white('1.0.0')} ${c.dim('·')} ${c.dim('CBI Database:')} ${c.gold('80+ Platforms')} ${c.dim('·')} ${c.cyan('Zero Deps')}`;
+  const metaLine = `${indentMeta} ${c.badgeRed('RED JOHN MARK')} ${c.dim('Version:')} ${c.white(appVersion)} ${c.dim('·')} ${c.dim('CBI Database:')} ${c.gold('80+ Platforms')} ${c.dim('·')} ${c.cyan('Zero Deps')}`;
 
   const quoteLen = quote.length + 4;
   const padQuote = Math.max(0, Math.floor((termWidth - quoteLen) / 2));

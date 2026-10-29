@@ -4,7 +4,7 @@
 import { parseArgs } from 'node:util';
 import { huntUsername, getSites, getCategories } from '../core/engine.js';
 import { investigateInstagram } from '../modules/instagram/index.js';
-import { getBanner } from './banner.js';
+import { getBanner, appVersion } from './banner.js';
 import { c } from './colors.js';
 import { ProgressBar } from './progress.js';
 import { printHit, printSummary, printInstagramHit, printInstagramSummary } from './table.js';
@@ -114,7 +114,7 @@ export async function runCli(argv = process.argv.slice(2)) {
   }
 
   if (values.version) {
-    console.log('patrickuser v1.0.0 (Native ESM)');
+    console.log(`patrickuser v${appVersion} (Native ESM)`);
     return;
   }
 
