@@ -50,7 +50,8 @@ export {
   checkLichess,
   checkAniList,
   checkSpeedrun,
-  checkTikTok
+  checkTikTok,
+  checkInstagram
 } from './adapters/index.js';
 
 export {

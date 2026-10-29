@@ -4,21 +4,36 @@
  * Modernized 100% Native Node.js ESM inspired by YesItsMe
  */
 
+import crypto from 'node:crypto';
 import { request, getRandomUserAgent } from '../../core/http.js';
-import { extractMetadata, decodeHtmlEntities } from '../../core/parser.js';
+import { decodeHtmlEntities } from '../../core/parser.js';
 
 const WEB_APP_ID = '936619743392459';
 const ASBD_ID = '129477';
+
+// YesItsMe / Toutatis official private mobile HMAC key
+const IG_SIG_KEY = 'e6358aeede676184b9fe702b30f4fd35e71744605e39d2181a34cede076b3c33';
+const SIG_KEY_VERSION = '4';
+
+/**
+ * Generate YesItsMe HMAC signed body for Instagram Mobile API endpoints
+ * @param {string} payloadString
+ * @returns {string}
+ */
+export function generateInstagramSignature(payloadString) {
+  const hmac = crypto.createHmac('sha256', IG_SIG_KEY).update(payloadString).digest('hex');
+  return `ig_sig_key_version=${SIG_KEY_VERSION}&signed_body=${hmac}.${encodeURIComponent(payloadString)}`;
+}
 
 /**
  * Extract followers, following, posts and full name from standard Instagram OpenGraph description
  * e.g. "1,234 Followers, 567 Following, 89 Posts - See Instagram photos and videos from Carlos Silva (@carlos.silva)"
  * 
- * @param {string} ogDescription
- * @param {string} [ogTitle]
+ * @param {string} rawOgDescription
+ * @param {string} [rawOgTitle='']
  * @returns {{ followers: number, following: number, postsCount: number, fullName: string }}
  */
-export function parseOgDescription(ogDescription, ogTitle = '') {
+export function parseOgDescription(rawOgDescription, rawOgTitle = '') {
   const result = {
     followers: 0,
     following: 0,
@@ -26,19 +41,26 @@ export function parseOgDescription(ogDescription, ogTitle = '') {
     fullName: ''
   };
 
-  if (!ogDescription || typeof ogDescription !== 'string') return result;
+  if (!rawOgDescription || typeof rawOgDescription !== 'string') return result;
 
-  // Numbers parsing helper (handles 1,234 or 1.234 or 12K or 1.5M)
+  const ogDescription = decodeHtmlEntities(rawOgDescription);
+  const ogTitle = decodeHtmlEntities(rawOgTitle);
+
+  // Numbers parsing helper (handles 1,234 or 1.234 or 12K or 1.5M or 680M)
   function parseCount(str) {
     if (!str) return 0;
     const clean = str.trim().toUpperCase();
-    if (clean.endsWith('K')) {
-      return Math.round(parseFloat(clean.replace(',', '.')) * 1000);
+    if (cEnds(clean, 'K')) {
+      return Math.round(parseFloat(clean.slice(0, -1).replace(',', '.')) * 1000);
     }
-    if (clean.endsWith('M')) {
-      return Math.round(parseFloat(clean.replace(',', '.')) * 1000000);
+    if (cEnds(clean, 'M')) {
+      return Math.round(parseFloat(clean.slice(0, -1).replace(',', '.')) * 1000000);
     }
     return parseInt(clean.replace(/[.,\s]/g, ''), 10) || 0;
+  }
+
+  function cEnds(s, suffix) {
+    return s.endsWith(suffix);
   }
 
   const matchStats = ogDescription.match(/([\d.,KM]+)\s*Followers?,\s*([\d.,KM]+)\s*Following,\s*([\d.,KM]+)\s*Posts?/i);
@@ -49,18 +71,116 @@ export function parseOgDescription(ogDescription, ogTitle = '') {
   }
 
   // Extract name: "... from Full Name (@username)"
-  const matchName = ogDescription.match(/from\s+(.+?)\s+\(@/i);
+  const matchName = ogDescription.match(/from\s+(.+?)\s+\(@/i) || ogTitle.match(/^(.+?)\s*\(@/);
   if (matchName) {
     result.fullName = decodeHtmlEntities(matchName[1].trim());
-  } else if (ogTitle) {
-    // "Carlos Silva (@carlos.silva) • Instagram photos and videos"
-    const matchTitle = ogTitle.match(/^(.+?)\s*\(@/);
-    if (matchTitle) {
-      result.fullName = decodeHtmlEntities(matchTitle[1].trim());
-    }
   }
 
   return result;
+}
+
+/**
+ * Extract rich profile attributes directly from public Instagram HTML page
+ * @param {string} html
+ * @param {string} cleanHandle
+ * @returns {{
+ *   exists: boolean,
+ *   profile: {
+ *     id: string,
+ *     username: string,
+ *     fullName: string,
+ *     biography: string,
+ *     avatarUrl: string,
+ *     isPrivate: boolean,
+ *     isVerified: boolean,
+ *     followers: number,
+ *     following: number,
+ *     postsCount: number,
+ *     externalUrl: string
+ *   } | null
+ * }}
+ */
+export function parseInstagramHtml(html, cleanHandle) {
+  if (!html || typeof html !== 'string') {
+    return { exists: false, profile: null };
+  }
+
+  // Extract meta tags by property or content
+  const ogTitleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']*)["']/i) ||
+    html.match(/<meta[^>]*content=["']([^"']*)["'][^>]*property=["']og:title["']/i);
+  const ogDescMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']*)["']/i) ||
+    html.match(/<meta[^>]*content=["']([^"']*)["'][^>]*property=["']og:description["']/i);
+  const ogImgMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']*)["']/i) ||
+    html.match(/<meta[^>]*content=["']([^"']*)["'][^>]*property=["']og:image["']/i);
+
+  if (!ogTitleMatch && !ogImgMatch) {
+    return { exists: false, profile: null };
+  }
+
+  const ogTitle = ogTitleMatch ? decodeHtmlEntities(ogTitleMatch[1]) : '';
+  const ogDesc = ogDescMatch ? decodeHtmlEntities(ogDescMatch[1]) : '';
+  const ogImg = ogImgMatch ? decodeHtmlEntities(ogImgMatch[1]) : '';
+
+  // Nonexistent user returns title "Instagram" and no description
+  if (ogTitle === 'Instagram' && !ogDesc) {
+    return { exists: false, profile: null };
+  }
+
+  // Parse followers, following, posts, full name
+  const parsed = parseOgDescription(ogDesc, ogTitle);
+
+  // Extract biography from embedded JSON scripts
+  let biography = '';
+  const bioMatch = html.match(/"biography":"([^"]*)"/);
+  if (bioMatch) {
+    try {
+      biography = JSON.parse('"' + bioMatch[1] + '"');
+    } catch {
+      biography = bioMatch[1];
+    }
+  }
+
+  // Extract Meta User ID (PK)
+  let id = '';
+  const idMatch = html.match(/"props":\{"id":"(\d+)"/) ||
+    html.match(/"user_id":"(\d+)"/) ||
+    html.match(/"target_id":"(\d+)"/) ||
+    html.match(/profilePage_(\d+)/);
+  if (idMatch) {
+    id = idMatch[1];
+  }
+
+  // Verified & Private flags
+  const isVerified = /"is_verified":true/.test(html);
+  const isPrivate = /"is_private":true/.test(html);
+
+  // External URL
+  let externalUrl = '';
+  const extUrlMatch = html.match(/"external_url":"([^"]*)"/);
+  if (extUrlMatch) {
+    try {
+      externalUrl = JSON.parse('"' + extUrlMatch[1] + '"');
+    } catch {
+      externalUrl = extUrlMatch[1];
+    }
+  }
+
+  return {
+    exists: true,
+    profile: {
+      id,
+      username: cleanHandle,
+      fullName: parsed.fullName || cleanHandle,
+      biography: biography || ogDesc,
+      avatarUrl: ogImg || '',
+      isPrivate,
+      isVerified,
+      followers: parsed.followers,
+      following: parsed.following,
+      postsCount: parsed.postsCount,
+      externalUrl
+    }
+  };
 }
 
 /**
@@ -98,7 +218,7 @@ export function extractMasksFromText(text) {
  * 
  * @param {string} username
  * @param {Object} [options]
- * @param {number} [options.timeout=6000]
+ * @param {number} [options.timeout=8000]
  * @param {string} [options.sessionId]
  * @param {Object} [options.mockData]
  * @returns {Promise<{
@@ -116,55 +236,51 @@ export function extractMasksFromText(text) {
  *     postsCount: number,
  *     externalUrl: string
  *   } | null,
- *   source: 'api' | 'web_opengraph' | 'oembed' | 'mock' | 'none',
+ *   source: 'api' | 'web_opengraph' | 'mock' | 'none',
  *   rateLimited: boolean
  * }>}
  */
 export async function reconInstagramProfile(username, options = {}) {
-  const {
-    timeout = 6000,
-    sessionId = null,
-    mockData = null
-  } = options;
+  const cleanHandle = username.replace(/^@+/, '').trim();
+  const sessionId = options.sessionId || process.env.IG_SESSION_ID || process.env.INSTAGRAM_SESSION_ID || null;
+  const timeout = options.timeout || 8000;
+  const mockData = options.mockData;
 
-  if (mockData && mockData[username]) {
+  if (mockData && mockData[cleanHandle]) {
     return {
       exists: true,
-      profile: mockData[username],
+      profile: mockData[cleanHandle],
       source: 'mock',
       rateLimited: false
     };
   }
 
-  const cleanHandle = username.replace(/^@+/, '').trim();
   const profileUrl = `https://www.instagram.com/${cleanHandle}/`;
+  const ua = getRandomUserAgent();
 
-  // Step 1: Query Instagram Web Profile Info API
-  const apiUrl = `https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(cleanHandle)}`;
-  const headers = {
-    'x-ig-app-id': WEB_APP_ID,
-    'x-asbd-id': ASBD_ID,
-    'x-ig-www-claim': '0',
-    'x-requested-with': 'XMLHttpRequest',
-    'Accept': '*/*',
-    'Referer': profileUrl,
-    'User-Agent': getRandomUserAgent()
-  };
-
+  // Step 1: If session cookie is provided, attempt official Instagram User Info endpoint (YesItsMe getInfo)
   if (sessionId) {
-    headers['Cookie'] = `sessionid=${sessionId};`;
-  }
+    try {
+      const headers = {
+        'User-Agent': 'Instagram 278.0.0.19.115 Android',
+        'Cookie': `sessionid=${sessionId};`,
+        'Accept': '*/*'
+      };
 
-  try {
-    const res = await request(apiUrl, {
-      method: 'GET',
-      headers,
-      timeout
-    });
+      const webApiUrl = `https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(cleanHandle)}`;
+      const apiRes = await request(webApiUrl, {
+        headers: {
+          ...headers,
+          'x-ig-app-id': WEB_APP_ID,
+          'x-asbd-id': ASBD_ID,
+          'x-requested-with': 'XMLHttpRequest',
+          'Referer': profileUrl
+        },
+        timeout
+      });
 
-    if (res.status === 200) {
-      try {
-        const json = JSON.parse(res.text);
+      if (apiRes.status === 200) {
+        const json = JSON.parse(apiRes.text);
         const user = json?.data?.user;
         if (user) {
           return {
@@ -172,7 +288,7 @@ export async function reconInstagramProfile(username, options = {}) {
             profile: {
               id: String(user.id || ''),
               username: user.username || cleanHandle,
-              fullName: user.full_name || '',
+              fullName: user.full_name || cleanHandle,
               biography: user.biography || '',
               avatarUrl: user.profile_pic_url_hd || user.profile_pic_url || '',
               isPrivate: Boolean(user.is_private),
@@ -186,59 +302,44 @@ export async function reconInstagramProfile(username, options = {}) {
             rateLimited: false
           };
         }
-      } catch {
-        // Fallback to HTML scraping
       }
+    } catch {
+      // Fallback to HTML parsing
     }
-
-    if (res.status === 404) {
-      return {
-        exists: false,
-        profile: null,
-        source: 'api',
-        rateLimited: false
-      };
-    }
-  } catch {
-    // Continue to fallbacks on network timeout or connection reset
   }
 
-  // Step 2: Fallback to HTML OpenGraph scraping
+  // Step 2: High-accuracy Public HTML & JSON Parser
   try {
     const htmlRes = await request(profileUrl, {
       method: 'GET',
       headers: {
-        'User-Agent': getRandomUserAgent(),
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9'
+        'User-Agent': ua,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9,pt-BR;q=0.8'
       },
       timeout
     });
 
     if (htmlRes.status === 200) {
-      const meta = extractMetadata(htmlRes.text);
-      if (meta.title && !meta.title.includes('Page Not Found')) {
-        const parsed = parseOgDescription(meta.description || '', meta.title || '');
+      const parsed = parseInstagramHtml(htmlRes.text, cleanHandle);
+      if (parsed.exists && parsed.profile) {
         return {
           exists: true,
-          profile: {
-            id: '',
-            username: cleanHandle,
-            fullName: parsed.fullName || meta.title.split('(')[0].trim(),
-            biography: meta.description || '',
-            avatarUrl: meta.image || '',
-            isPrivate: false,
-            isVerified: false,
-            followers: parsed.followers,
-            following: parsed.following,
-            postsCount: parsed.postsCount,
-            externalUrl: ''
-          },
+          profile: parsed.profile,
+          source: 'web_opengraph',
+          rateLimited: false
+        };
+      } else {
+        return {
+          exists: false,
+          profile: null,
           source: 'web_opengraph',
           rateLimited: false
         };
       }
-    } else if (htmlRes.status === 404) {
+    }
+
+    if (htmlRes.status === 404) {
       return {
         exists: false,
         profile: null,
@@ -247,42 +348,7 @@ export async function reconInstagramProfile(username, options = {}) {
       };
     }
   } catch {
-    // Continue to oEmbed fallback
-  }
-
-  // Step 3: Fallback to Public oEmbed API
-  try {
-    const oembedUrl = `https://www.instagram.com/api/v1/oembed/?url=${encodeURIComponent(profileUrl)}`;
-    const oembedRes = await request(oembedUrl, {
-      method: 'GET',
-      timeout
-    });
-
-    if (oembedRes.status === 200) {
-      const data = JSON.parse(oembedRes.text);
-      if (data && data.author_name) {
-        return {
-          exists: true,
-          profile: {
-            id: '',
-            username: cleanHandle,
-            fullName: data.author_name || '',
-            biography: data.title || '',
-            avatarUrl: data.thumbnail_url || '',
-            isPrivate: false,
-            isVerified: false,
-            followers: 0,
-            following: 0,
-            postsCount: 0,
-            externalUrl: data.author_url || ''
-          },
-          source: 'oembed',
-          rateLimited: false
-        };
-      }
-    }
-  } catch {
-    // Ignore and conclude
+    // Continue
   }
 
   return {
@@ -299,7 +365,8 @@ export async function reconInstagramProfile(username, options = {}) {
  * 
  * @param {string} usernameOrEmail
  * @param {Object} [options]
- * @param {number} [options.timeout=6000]
+ * @param {number} [options.timeout=8000]
+ * @param {string} [options.sessionId]
  * @param {string} [options.csrfToken]
  * @param {Object} [options.mockRecovery]
  * @returns {Promise<{
@@ -312,13 +379,10 @@ export async function reconInstagramProfile(username, options = {}) {
  * }>}
  */
 export async function lookupAccountRecovery(usernameOrEmail, options = {}) {
-  const {
-    timeout = 6000,
-    csrfToken = 'missing',
-    mockRecovery = null
-  } = options;
-
   const cleanTarget = usernameOrEmail.replace(/^@+/, '').trim();
+  const sessionId = options.sessionId || process.env.IG_SESSION_ID || process.env.INSTAGRAM_SESSION_ID || null;
+  const timeout = options.timeout || 8000;
+  const mockRecovery = options.mockRecovery;
 
   if (mockRecovery && mockRecovery[cleanTarget]) {
     const mock = mockRecovery[cleanTarget];
@@ -332,73 +396,97 @@ export async function lookupAccountRecovery(usernameOrEmail, options = {}) {
     };
   }
 
-  const recoveryUrl = 'https://www.instagram.com/api/v1/web/accounts/account_recovery_send_ajax/';
-  const body = `email_or_username=${encodeURIComponent(cleanTarget)}&flow=lookup`;
-
+  // 1. YesItsMe Mobile HMAC Signed Lookup
   try {
+    const payload = JSON.stringify({
+      login_attempt_count: '0',
+      directly_sign_in: 'true',
+      source: 'default',
+      q: cleanTarget,
+      ig_sig_key_version: SIG_KEY_VERSION
+    });
+
+    const signedBody = generateInstagramSignature(payload);
+    const lookupHeaders = {
+      'Accept-Language': 'en-US',
+      'User-Agent': 'Instagram 101.0.0.15.120',
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'X-FB-HTTP-Engine': 'Liger'
+    };
+
+    if (sessionId) {
+      lookupHeaders['Cookie'] = `sessionid=${sessionId};`;
+    }
+
+    const res = await request('https://i.instagram.com/api/v1/users/lookup/', {
+      method: 'POST',
+      headers: lookupHeaders,
+      body: signedBody,
+      timeout
+    });
+
+    if (res.status === 200) {
+      const rep = JSON.parse(res.text);
+      const user = rep?.user || rep;
+
+      const maskedEmail = user?.obfuscated_email || user?.email || null;
+      const maskedPhone = user?.obfuscated_phone || user?.phone_number || null;
+
+      if (maskedEmail || maskedPhone) {
+        return {
+          success: true,
+          maskedEmail,
+          maskedPhone,
+          contactPoint: user?.contact_point || null,
+          message: 'Contact mask retrieved successfully via mobile lookup',
+          rateLimited: false
+        };
+      }
+    }
+  } catch {
+    // Continue to web recovery flow
+  }
+
+  // 2. Web Recovery Flow (account_recovery_send_ajax)
+  try {
+    const recoveryUrl = 'https://www.instagram.com/api/v1/web/accounts/account_recovery_send_ajax/';
+    const body = `email_or_username=${encodeURIComponent(cleanTarget)}&flow=lookup`;
+    const headers = {
+      'x-ig-app-id': WEB_APP_ID,
+      'x-asbd-id': ASBD_ID,
+      'x-csrftoken': options.csrfToken || 'missing',
+      'x-requested-with': 'XMLHttpRequest',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Referer': 'https://www.instagram.com/accounts/password/reset/',
+      'User-Agent': getRandomUserAgent()
+    };
+
+    if (sessionId) {
+      headers['Cookie'] = `sessionid=${sessionId};`;
+    }
+
     const res = await request(recoveryUrl, {
       method: 'POST',
-      headers: {
-        'x-ig-app-id': WEB_APP_ID,
-        'x-asbd-id': ASBD_ID,
-        'x-csrftoken': csrfToken,
-        'x-requested-with': 'XMLHttpRequest',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Referer': 'https://www.instagram.com/accounts/password/reset/',
-        'User-Agent': getRandomUserAgent()
-      },
+      headers,
       body,
       timeout
     });
 
     if (res.status === 200) {
-      try {
-        const data = JSON.parse(res.text);
-        const masks = extractMasksFromText(JSON.stringify(data));
+      const data = JSON.parse(res.text);
+      const masks = extractMasksFromText(JSON.stringify(data));
 
-        return {
-          success: true,
-          maskedEmail: data.email || masks.maskedEmail || null,
-          maskedPhone: data.phone_number || masks.maskedPhone || null,
-          contactPoint: data.contact_point || null,
-          message: data.message || null,
-          rateLimited: false
-        };
-      } catch {
-        // Fallback parse text
-        const masks = extractMasksFromText(res.text);
-        if (masks.maskedEmail || masks.maskedPhone) {
-          return {
-            success: true,
-            maskedEmail: masks.maskedEmail,
-            maskedPhone: masks.maskedPhone,
-            contactPoint: null,
-            message: res.text,
-            rateLimited: false
-          };
-        }
-      }
-    }
-
-    if (res.status === 429) {
       return {
-        success: false,
-        maskedEmail: null,
-        maskedPhone: null,
-        contactPoint: null,
-        message: 'Instagram rate limit exceeded (HTTP 429)',
-        rateLimited: true
+        success: true,
+        maskedEmail: data.email || masks.maskedEmail || null,
+        maskedPhone: data.phone_number || masks.maskedPhone || null,
+        contactPoint: data.contact_point || null,
+        message: data.message || null,
+        rateLimited: false
       };
     }
-  } catch (err) {
-    return {
-      success: false,
-      maskedEmail: null,
-      maskedPhone: null,
-      contactPoint: null,
-      message: err.message,
-      rateLimited: true
-    };
+  } catch {
+    // Continue
   }
 
   return {
@@ -406,8 +494,7 @@ export async function lookupAccountRecovery(usernameOrEmail, options = {}) {
     maskedEmail: null,
     maskedPhone: null,
     contactPoint: null,
-    message: null,
+    message: sessionId ? 'Nenhuma máscara de recuperação encontrada' : 'Sessão requerida para máscaras de recuperação',
     rateLimited: false
   };
 }
-

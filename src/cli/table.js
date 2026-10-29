@@ -138,6 +138,10 @@ export function printInstagramHit(hit) {
       const bioSnippet = bioClean.length > 90 ? `${bioClean.slice(0, 90)}...` : bioClean;
       console.log(`    ${c.darkGray('↳')} ${c.dim('Bio:')} ${c.gray(bioSnippet)}`);
     }
+
+    if (prof.avatarUrl) {
+      console.log(`    ${c.darkGray('↳')} ${c.dim('Foto Perfil:')} ${c.darkGray(prof.avatarUrl)}`);
+    }
   }
 
   // Obfuscated recovery contacts
@@ -215,6 +219,14 @@ export function printInstagramSummary(results) {
   if (target.telefone) console.log(` ${c.dim('Telefone Alvo:')} ${c.gold(target.telefone)}`);
   console.log(` ${c.dim('Permutações:')} ${c.white(String(totalPermutations))} ${c.dim('·')} ${c.dim('Consultados:')} ${c.white(String(checkedCount))} ${c.dim('·')} ${c.dim('Perfis Encontrados:')} ${c.neonGreen(String(foundCount))}`);
   console.log(` ${c.dim('Alta Certeza (>=75%):')} ${c.neonGreen(c.bold(String(highCertaintyMatches.length)))} ${c.dim('·')} ${c.dim('Média Certeza (45-74%):')} ${c.amber(String(mediumCertaintyMatches.length))} ${c.dim('·')} ${c.dim('Duração:')} ${c.white((durationMs / 1000).toFixed(2) + 's')}`);
+
+  const hasRecoveryMask = matches.some((m) => m.recovery?.maskedEmail || m.recovery?.maskedPhone);
+  if (!hasRecoveryMask && (target.email || target.telefone)) {
+    console.log(`\n ${c.cyan('ℹ')} ${c.dim('Nota sobre E-mail/Telefone Ofuscados:')}`);
+    console.log(`   ${c.dim('O Instagram protege as máscaras de recuperação contra requisições anônimas.')}`);
+    console.log(`   ${c.dim('Para extrair máscaras ofuscadas completas (como no YesItsMe original), use:')}`);
+    console.log(`   ${c.gold('rimuuser insta --nome "..." --session <seu_sessionid>')} ${c.dim('ou configure')} ${c.cyan('export IG_SESSION_ID=<cookie>')}`);
+  }
   console.log(`${c.darkGray('────────────────────────────────────────────────────────────────────────────')}\n`);
 }
 

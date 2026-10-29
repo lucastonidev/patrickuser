@@ -313,5 +313,39 @@ describe('Instagram Engine: Full Investigation Pipeline', () => {
     assert.ok(perms.length > 0);
     assert.ok(perms.includes('ana.souza'));
   });
+
+  test('parses Instagram HTML markup accurately without false negatives', async () => {
+    const { parseInstagramHtml, generateInstagramSignature } = await import('../src/modules/instagram/recon.js');
+
+    const sampleHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta property="og:title" content="National Geographic (&#064;natgeo) &#x2022; Instagram photos and videos" />
+        <meta property="og:description" content="268M Followers, 196 Following, 32K Posts - See Instagram photos and videos from National Geographic (&#064;natgeo)" />
+        <meta property="og:image" content="https://scontent.cdninstagram.com/avatar_hd.jpg" />
+      </head>
+      <body>
+        <script>{"props":{"id":"787132"},"biography":"Step into wonder \\ud83c\\udf0e","is_verified":true,"is_private":false}</script>
+      </body>
+      </html>
+    `;
+
+    const parsed = parseInstagramHtml(sampleHtml, 'natgeo');
+    assert.strictEqual(parsed.exists, true);
+    assert.strictEqual(parsed.profile.fullName, 'National Geographic');
+    assert.strictEqual(parsed.profile.followers, 268000000);
+    assert.strictEqual(parsed.profile.following, 196);
+    assert.strictEqual(parsed.profile.postsCount, 32000);
+    assert.strictEqual(parsed.profile.id, '787132');
+    assert.strictEqual(parsed.profile.avatarUrl, 'https://scontent.cdninstagram.com/avatar_hd.jpg');
+    assert.ok(parsed.profile.biography.includes('Step into wonder'));
+    assert.strictEqual(parsed.profile.isVerified, true);
+    assert.strictEqual(parsed.profile.isPrivate, false);
+
+    // Test signature generation
+    const sig = generateInstagramSignature(JSON.stringify({ q: 'natgeo' }));
+    assert.ok(sig.startsWith('ig_sig_key_version=4&signed_body='));
+  });
 });
 
