@@ -7,12 +7,14 @@
   "exports": {
     ".": "./src/index.js",
     "./engine": "./src/core/engine.js",
-    "./server": "./src/server/index.js"
+    "./server": "./src/server/index.js",
+    "./instagram": "./src/modules/instagram/index.js"
   },
   "bin": {
     "patrickuser": "./bin/patrickuser.js",
     "patrichuser": "./bin/patrickuser.js",
-    "patrick": "./bin/patrickuser.js"
+    "patrick": "./bin/patrickuser.js",
+    "rimuuser": "./bin/patrickuser.js"
   },
   "scripts": {
     "start": "node bin/patrickuser.js",

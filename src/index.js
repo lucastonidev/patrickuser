@@ -64,3 +64,24 @@ export {
   saveToFile
 } from './cli/exporter.js';
 
+export {
+  investigateInstagram,
+  generateHandlePermutations,
+  InstagramEngine,
+  sanitizeInstagramHandle,
+  isValidInstagramHandle,
+  decomposeName,
+  resolveProfessionTokens,
+  PROFESSIONS_CATALOG,
+  reconInstagramProfile,
+  lookupAccountRecovery,
+  calculateMatchScore,
+  matchDomainMask,
+  extractMaskTrailingDigits,
+  estimateAccountAge,
+  extractBioEntities,
+  generateReverseImageSearchUrls,
+  generateCrossSocialLinks,
+  META_PK_CHRONOLOGY
+} from './modules/instagram/index.js';
+
